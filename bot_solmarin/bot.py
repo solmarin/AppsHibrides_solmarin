@@ -4,6 +4,7 @@ import random
 global respuesta
 respuesta = False
 bot = telebot.TeleBot("961311462:AAHxlkA4pjGnQrc2faCXdYCmGQo4tvOjJk0")
+fic = open("votos.txt", "w")
 @bot.message_handler(commands=['start', 'hola'])
 def send_welcome(message):
     global respuesta
@@ -28,13 +29,15 @@ def photoRandom(message):
 def youtube(message):
     bot.reply_to(message, "Aqui tienes.. el mejor canal del mundo: \n https://www.youtube.com/channel/UCgpx4FGiw485p3vujJgJ1zg")
 
+@bot.message_handler(commands=['firma'])
+
 @bot.message_handler(content_types=['text'])
 def respostas(message):
     global respuesta
     if respuesta:
         if message.text == "si":
             respuesta = False
-            bot.send_message(message.chat.id,"Si? Felicidades, ya puedes decir que conoces las respuestas a todo!")
+            bot.send_message(message.chat.id,"Si? Felicidades, ya puedes decir que conoces las respuestas a todo! \n Podrias firmar para que Lluc llegue a Presidente (usa el comando /firma)! \n Si quieres consultar las firmas, /cfirma")
         elif message.text == "no":
             respuesta = False
             bot.send_message(message.chat.id,"En serio? Entonces no sabes lo que es la belleza.")
