@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import telebot
 import random
+import os.path as path
+from multiprocessing import Value
 global respuesta
 respuesta = False
+numUsuari= Value('i',1)
 bot = telebot.TeleBot("961311462:AAHxlkA4pjGnQrc2faCXdYCmGQo4tvOjJk0")
-fic = open("votos.txt", "w")
 @bot.message_handler(commands=['start', 'hola'])
 def send_welcome(message):
     global respuesta
@@ -30,6 +32,30 @@ def youtube(message):
     bot.reply_to(message, "Aqui tienes.. el mejor canal del mundo: \n https://www.youtube.com/channel/UCgpx4FGiw485p3vujJgJ1zg")
 
 @bot.message_handler(commands=['firma'])
+def firma(message):
+    firmaUsuario = str(message.chat.first_name)
+
+    if path.exists('votos.txt') == True:
+        with open("fichero.txt") as f:
+            for line in f:
+                if firmaUsuario in line:
+                    bot.reply_to(message,"Ya as firmado.")
+                else:
+                    fic.write(str(numUsuari.value) + " - " +firmaUsuario+"\n")
+                    numUsuari.value = numUsuari.value + 1
+    else:
+        fic = open('votos.txt', 'a')
+        fic.write("LLUC X PRESIDENT")
+        fic.write(str(numUsuari.value) + " - " +firmaUsuario+"\n")
+        numUsuari.value = numUsuari.value + 1
+
+
+
+
+
+
+    fic.close()
+
 
 @bot.message_handler(content_types=['text'])
 def respostas(message):
