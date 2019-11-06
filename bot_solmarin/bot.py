@@ -12,15 +12,21 @@ def send_welcome(message):
 
 @bot.message_handler(commands=['random'])
 def photoRandom(message):
+    imagen = ''
     i = (random.randint(1,5))
     switcher = {
-        1: bot.send_photo(message.chat.id,open('imagenes/1.png', 'rb')),
-        2: bot.send_photo(message.chat.id,open('imagenes/2.png', 'rb')),
-        3: bot.send_photo(message.chat.id,open('imagenes/3.png', 'rb')),
-        4: bot.send_photo(message.chat.id,open('imagenes/4.png', 'rb')),
-        5: bot.send_photo(message.chat.id,open('imagenes/5.png', 'rb'))
+        1:'imagenes/1.png',
+        2:'imagenes/2.png',
+        3:'imagenes/3.png',
+        4:'imagenes/4.png',
+        5:'imagenes/5.png',
     }
-    bot.reply_to(message,switcher.get(i,"PROBLEM RANDOM"))
+
+    bot.send_photo(message.chat.id,open(switcher.get(i,"PROBLEM RANDOM"), 'rb'))
+
+@bot.message_handler(commands=['youtube'])
+def youtube(message):
+    bot.reply_to(message, "Aqui tienes.. el mejor canal del mundo: \n https://www.youtube.com/channel/UCgpx4FGiw485p3vujJgJ1zg")
 
 @bot.message_handler(content_types=['text'])
 def respostas(message):
@@ -35,6 +41,7 @@ def respostas(message):
         else:
             respuesta = False
             bot.send_message(message.chat.id,"No entiendo tu respuesta, mira esto:")
+            bot.send_photo(message.chat.id,open('imagenes/5.png', 'rb'))
 
 
 
