@@ -7,6 +7,7 @@ global respuesta
 respuesta = False
 numUsuari= Value('i',1)
 bot = telebot.TeleBot("961311462:AAHxlkA4pjGnQrc2faCXdYCmGQo4tvOjJk0")
+
 @bot.message_handler(commands=['start', 'hola'])
 def send_welcome(message):
     global respuesta
@@ -24,7 +25,6 @@ def photoRandom(message):
         4:'imagenes/4.png',
         5:'imagenes/5.png',
     }
-
     bot.send_photo(message.chat.id,open(switcher.get(i,"PROBLEM RANDOM"), 'rb'))
 
 @bot.message_handler(commands=['youtube'])
@@ -33,27 +33,16 @@ def youtube(message):
 
 @bot.message_handler(commands=['firma'])
 def firma(message):
-    firmaUsuario = str(message.chat.first_name)
-
+    firmaUsuario = str(message.text)
+    firmaUsuario= firmaUsuario.replace('/firma', '')
     if path.exists('votos.txt') == True:
-        with open("fichero.txt") as f:
-            for line in f:
-                if firmaUsuario in line:
-                    bot.reply_to(message,"Ya as firmado.")
-                else:
-                    fic.write(str(numUsuari.value) + " - " +firmaUsuario+"\n")
-                    numUsuari.value = numUsuari.value + 1
-    else:
         fic = open('votos.txt', 'a')
+        fic.write(str(numUsuari.value) + " - " +firmaUsuario+"\n")
+    else:
+        fic = open('votos.txt', 'w')
         fic.write("LLUC X PRESIDENT")
         fic.write(str(numUsuari.value) + " - " +firmaUsuario+"\n")
-        numUsuari.value = numUsuari.value + 1
-
-
-
-
-
-
+    numUsuari.value = numUsuari.value + 1
     fic.close()
 
 
@@ -63,7 +52,7 @@ def respostas(message):
     if respuesta:
         if message.text == "si":
             respuesta = False
-            bot.send_message(message.chat.id,"Si? Felicidades, ya puedes decir que conoces las respuestas a todo! \n Podrias firmar para que Lluc llegue a Presidente (usa el comando /firma)! \n Si quieres consultar las firmas, /cfirma")
+            bot.send_message(message.chat.id,"Si? Felicidades, ya puedes decir que conoces las respuestas a todo! \nPodrias firmar para que Lluc llegue a Presidente (usa el comando /firma + nom + dni)!")
         elif message.text == "no":
             respuesta = False
             bot.send_message(message.chat.id,"En serio? Entonces no sabes lo que es la belleza.")
@@ -71,8 +60,6 @@ def respostas(message):
             respuesta = False
             bot.send_message(message.chat.id,"No entiendo tu respuesta, mira esto:")
             bot.send_photo(message.chat.id,open('imagenes/5.png', 'rb'))
-
-
 
 
 bot.polling(none_stop=True)
