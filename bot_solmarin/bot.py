@@ -7,8 +7,11 @@ global respuesta
 respuesta = False
 numUsuari= Value('i',1)
 bot = telebot.TeleBot("961311462:AAHxlkA4pjGnQrc2faCXdYCmGQo4tvOjJk0")
-
-@bot.message_handler(commands=['start', 'hola'])
+info = "MANUAL DE LAS FUNCIONES DEL BOT\n   /hola -> comienza conversación\n   /youtube -> te envia al canal\n   /random -> te envia una foto\n   /firma -> abrir archivo para firmar\n   /start o /help -> mostra manual del bot"
+@bot.message_handler(commands=['start','help'])
+def send_info(message):
+    bot.send_message(message.chat.id, info)
+@bot.message_handler(commands=['hola'])
 def send_welcome(message):
     global respuesta
     respuesta = True
@@ -33,17 +36,34 @@ def youtube(message):
 
 @bot.message_handler(commands=['firma'])
 def firma(message):
+    firmado = False
     firmaUsuario = str(message.text)
     firmaUsuario= firmaUsuario.replace('/firma', '')
-    if path.exists('votos.txt') == True:
-        fic = open('votos.txt', 'a')
-        fic.write(str(numUsuari.value) + " - " +firmaUsuario+"\n")
+
+    if firmaUsuario == '':
+        bot.reply_to(message,"No as introducido ninguna firma.")
     else:
-        fic = open('votos.txt', 'w')
-        fic.write("LLUC X PRESIDENT")
-        fic.write(str(numUsuari.value) + " - " +firmaUsuario+"\n")
-    numUsuari.value = numUsuari.value + 1
-    fic.close()
+        if path.exists('votos.txt') == True:
+            f = open('votos.txt','r')
+            for line in f:
+                if firmaUsuario in line:
+                    firmado = True
+                    bot.reply_to(message,"Ya as firmado.")
+
+            f.close()
+
+            if not firmado:
+                fic = open('votos.txt', 'a')
+                fic.write(str(numUsuari.value) + " - " +firmaUsuario+"\n")
+                numUsuari.value = numUsuari.value + 1
+                fic.close()
+
+        else:
+            fic = open('votos.txt', 'a')
+            fic.write("LLUC X PRESIDENT")
+            fic.write(str(numUsuari.value) + " - " +firmaUsuario+"\n")
+            numUsuari.value = numUsuari.value + 1
+            fic.close()
 
 
 @bot.message_handler(content_types=['text'])
@@ -60,6 +80,5 @@ def respostas(message):
             respuesta = False
             bot.send_message(message.chat.id,"No entiendo tu respuesta, mira esto:")
             bot.send_photo(message.chat.id,open('imagenes/5.png', 'rb'))
-
 
 bot.polling(none_stop=True)
