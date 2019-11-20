@@ -1,3 +1,4 @@
 LLUC FOR PRESIDENTE
-1 -  sol marin
-2 -  jordi
+1 -  sol
+2 -  marc
+3 -  pol

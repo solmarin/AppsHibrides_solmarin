@@ -4,10 +4,12 @@ import random
 import os.path as path
 from multiprocessing import Value
 global respuesta
+global escribiendo
+escribiendo = False
 respuesta = False
 numUsuari= Value('i',1)
 bot = telebot.TeleBot("961311462:AAHxlkA4pjGnQrc2faCXdYCmGQo4tvOjJk0")
-info = "MANUAL DE LAS FUNCIONES DEL BOT\n   /hola -> comienza conversación\n   /youtube -> te envia al canal\n   /random -> te envia una foto\n   /firma -> abrir archivo para firmar\n   /start o /help -> mostra manual del bot"
+info = "MANUAL DE LAS FUNCIONES DEL BOT\n   /hola -> comienza conversación\n   /youtube -> te envia el canal\n   /random -> te envia una foto\n   /firma + nombre + dni -> firma en el archivo\n   /start o /help -> mostra manual del bot"
 @bot.message_handler(commands=['start','help'])
 def send_info(message):
     bot.send_message(message.chat.id, info)
@@ -16,6 +18,7 @@ def send_welcome(message):
     global respuesta
     respuesta = True
     bot.reply_to(message, "Hola! Queria preguntarte.. conoces a LLuc? si/no")
+
 
 @bot.message_handler(commands=['random'])
 def photoRandom(message):
@@ -36,34 +39,41 @@ def youtube(message):
 
 @bot.message_handler(commands=['firma'])
 def firma(message):
-    firmado = False
-    firmaUsuario = str(message.text)
-    firmaUsuario= firmaUsuario.replace('/firma', '')
+    global escribiendo
+    if escribiendo == False:
+        escribiendo= True
+        firmado = False
+        firmaUsuario = str(message.text)
+        firmaUsuario= firmaUsuario.replace('/firma', '')
+        if firmaUsuario == '':
+            bot.reply_to(message,"No as introducido ninguna firma.")
+        else:
+            if path.exists('votos.txt') == True:
+                f = open('votos.txt','r')
+                for line in f:
+                    if firmaUsuario in line:
+                        firmado = True
+                        bot.reply_to(message,"Ya as firmado.")
+                f.close()
+                escribiendo = False
 
-    if firmaUsuario == '':
-        bot.reply_to(message,"No as introducido ninguna firma.")
-    else:
-        if path.exists('votos.txt') == True:
-            f = open('votos.txt','r')
-            for line in f:
-                if firmaUsuario in line:
-                    firmado = True
-                    bot.reply_to(message,"Ya as firmado.")
-
-            f.close()
-
-            if not firmado:
+                if not firmado:
+                    fic = open('votos.txt', 'a')
+                    fic.write(str(numUsuari.value) + " - " +firmaUsuario+"\n")
+                    bot.reply_to(message,"Gracias por tu firma! Eres el " + str(numUsuari.value)+ " que ha firmado.")
+                    numUsuari.value = numUsuari.value + 1
+                    fic.close()
+                    escribiendo = False
+            else:
                 fic = open('votos.txt', 'a')
+                fic.write("LLUC X PRESIDENT")
                 fic.write(str(numUsuari.value) + " - " +firmaUsuario+"\n")
+                bot.reply_to(message,"Gracias por tu firma! Eres el "+ str(numUsuari.value) +" que ha firmado.")
                 numUsuari.value = numUsuari.value + 1
                 fic.close()
-
-        else:
-            fic = open('votos.txt', 'a')
-            fic.write("LLUC X PRESIDENT")
-            fic.write(str(numUsuari.value) + " - " +firmaUsuario+"\n")
-            numUsuari.value = numUsuari.value + 1
-            fic.close()
+                escribiendo = False
+    else:
+        bot.send_message(message.chat.id,"Cargando...")
 
 
 @bot.message_handler(content_types=['text'])
