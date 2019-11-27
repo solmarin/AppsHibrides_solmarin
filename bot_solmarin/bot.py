@@ -9,10 +9,12 @@ escribiendo = False
 respuesta = False
 numUsuari= Value('i',1)
 bot = telebot.TeleBot("961311462:AAHxlkA4pjGnQrc2faCXdYCmGQo4tvOjJk0")
-info = "MANUAL DE LAS FUNCIONES DEL BOT\n   /hola -> comienza conversación\n   /youtube -> te envia el canal\n   /random -> te envia una foto\n   /firma + nombre + dni -> firma en el archivo\n   /start o /help -> mostra manual del bot"
+info = "MANUAL DE LAS FUNCIONES DEL BOT\n   /hola -> comienza conversación\n   /youtube -> te envia el canal\n   /random -> te envia una foto\n   /firma + nombre + apellido + dni(12345678-A)\n   /start o /help -> mostra manual del bot"
+
 @bot.message_handler(commands=['start','help'])
 def send_info(message):
     bot.send_message(message.chat.id, info)
+
 @bot.message_handler(commands=['hola'])
 def send_welcome(message):
     global respuesta
@@ -40,41 +42,50 @@ def youtube(message):
 @bot.message_handler(commands=['firma'])
 def firma(message):
     global escribiendo
+    global firmado
     if escribiendo == False:
         escribiendo= True
         firmado = False
-        firmaUsuario = str(message.text)
-        firmaUsuario= firmaUsuario.replace('/firma', '')
-        if firmaUsuario == '':
-            bot.reply_to(message,"No as introducido ninguna firma.")
+        numE = False
+        i = 0
+        key = message.text.split()
+        dni = key[3].split('-',8);
+        if len(key) < 4 or len(key[3])<9:
+            bot.reply_to(message,"No as introducido una firma correcta. \nRecuerda: /firma + nombre + apellido + dni(12345678-A)")
+        elif dni[0].isalpha() == True or dni[1].isdigit() == True:
+                bot.reply_to(message,"No as introducido una firma correcta. \nRecuerda: el dni sigue este formato: 12345678-A")
         else:
             if path.exists('votos.txt') == True:
                 f = open('votos.txt','r')
                 for line in f:
-                    if firmaUsuario in line:
+                    if key[3] in line:
                         firmado = True
-                        bot.reply_to(message,"Ya as firmado.")
+                        bot.reply_to(message,"Error: este dni ya esta inscrito con una firma.")
+                    if str(numUsuari.value) in line:
+                        numE = True
+                    i+=1
                 f.close()
-                escribiendo = False
-
+                if numE :
+                    numUsuari.value = i
                 if not firmado:
                     fic = open('votos.txt', 'a')
-                    fic.write(str(numUsuari.value) + " - " +firmaUsuario+"\n")
+                    fic.write(str(numUsuari.value) + " - " +key[1]+" "+key[2]+" "+key[3]+"\n")
                     bot.reply_to(message,"Gracias por tu firma! Eres el " + str(numUsuari.value)+ " que ha firmado.")
                     numUsuari.value = numUsuari.value + 1
                     fic.close()
-                    escribiendo = False
             else:
                 fic = open('votos.txt', 'a')
                 fic.write("LLUC X PRESIDENT")
-                fic.write(str(numUsuari.value) + " - " +firmaUsuario+"\n")
+                fic.write(str(numUsuari.value) + " - " +key[1]+" "+key[2]+" "+key[3]+"\n")
                 bot.reply_to(message,"Gracias por tu firma! Eres el "+ str(numUsuari.value) +" que ha firmado.")
-                numUsuari.value = numUsuari.value + 1
+                numUsuari.value = 2
                 fic.close()
-                escribiendo = False
-    else:
-        bot.send_message(message.chat.id,"Cargando...")
+        escribiendo = False
 
+
+    else:
+        bot.send_message(message.chat.id,"En este momento no se puede acceder al archivo. Vuelve a internarlo más tarde!")
+        escribiendo = False
 
 @bot.message_handler(content_types=['text'])
 def respostas(message):
@@ -82,10 +93,10 @@ def respostas(message):
     if respuesta:
         if message.text == "si":
             respuesta = False
-            bot.send_message(message.chat.id,"Si? Felicidades, ya puedes decir que conoces las respuestas a todo! \nPodrias firmar para que Lluc llegue a Presidente (usa el comando /firma + nom + dni)!")
+            bot.send_message(message.chat.id,"Si? Felicidades, ya puedes decir que conoces las respuestas a todo! \nPodrias firmar para que Lluc llegue a Presidente (usa el comando /firma + nombre + apellido + dni (12345678-A)!")
         elif message.text == "no":
             respuesta = False
-            bot.send_message(message.chat.id,"En serio? Entonces no sabes lo que es la belleza.")
+            bot.send_message(message.chat.id,"En serio? Entonces no sabes lo que es la belleza.\nUtilitza el comando /random y ya veras... ")
         else:
             respuesta = False
             bot.send_message(message.chat.id,"No entiendo tu respuesta, mira esto:")
