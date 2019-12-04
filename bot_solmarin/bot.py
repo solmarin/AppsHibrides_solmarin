@@ -60,7 +60,7 @@ def firma(message):
                 for line in f:
                     if key[3].upper() in line:
                         firmado = True
-                        bot.reply_to(message,"Error: este dni ya esta inscrito con una firma.")
+                        bot.reply_to(message,"Error: este dni ya esta inscrito con una firma.\nFirma guardada: "+ line )
                     if str(numUsuari.value) in line:
                         numE = True
                     i+=1
