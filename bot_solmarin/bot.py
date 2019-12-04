@@ -46,39 +46,41 @@ def firma(message):
     numE = False
     i = 0
     key = message.text.split()
-    dni = key[3].split('-',8);
-    if len(key) < 4 or len(key[3])<9:
+
+    if len(key) < 4 or len(key[3])<10:
         bot.reply_to(message,"No as introducido una firma correcta. \nRecuerda: /firma + nombre + apellido + dni(12345678-A)")
-    elif dni[0].isalpha() == True or dni[1].isdigit() == True:
-            bot.reply_to(message,"No as introducido una firma correcta. \nRecuerda: el dni sigue este formato: 12345678-A")
     else:
-        escribiendo.acquire()
-        if path.exists('votos.txt') == True:
-            f = open('votos.txt','r')
-            for line in f:
-                if key[3] in line:
-                    firmado = True
-                    bot.reply_to(message,"Error: este dni ya esta inscrito con una firma.")
-                if str(numUsuari.value) in line:
-                    numE = True
-                i+=1
-            f.close()
-            if numE :
-                numUsuari.value = i
-            if not firmado:
-                fic = open('votos.txt', 'a')
-                fic.write(str(numUsuari.value) + " - " +key[1]+" "+key[2]+" "+key[3]+"\n")
-                bot.reply_to(message,"Gracias por tu firma! Eres el " + str(numUsuari.value)+ " que ha firmado.")
-                numUsuari.value = numUsuari.value + 1
-                fic.close()
+        dni = key[3].split('-',8);
+        if dni[0].isdigit() == False or dni[1].isdigit() == True:
+                bot.reply_to(message,"No as introducido una firma correcta. \nRecuerda: el dni sigue este formato: 12345678-A")
         else:
-            fic = open('votos.txt', 'a')
-            fic.write("LLUC X PRESIDENT")
-            fic.write(str(numUsuari.value) + " - " +key[1]+" "+key[2]+" "+key[3]+"\n")
-            bot.reply_to(message,"Gracias por tu firma! Eres el "+ str(numUsuari.value) +" que ha firmado.")
-            numUsuari.value = 2
-            fic.close()
-        escribiendo.release()
+            escribiendo.acquire()
+            if path.exists('votos.txt') == True:
+                f = open('votos.txt','r')
+                for line in f:
+                    if key[3].upper() in line:
+                        firmado = True
+                        bot.reply_to(message,"Error: este dni ya esta inscrito con una firma.")
+                    if str(numUsuari.value) in line:
+                        numE = True
+                    i+=1
+                f.close()
+                if numE :
+                    numUsuari.value = i
+                if not firmado:
+                    fic = open('votos.txt', 'a')
+                    fic.write(str(numUsuari.value) + " - " +key[1].upper()+" "+key[2].upper()+" "+key[3].upper()+"\n")
+                    bot.reply_to(message,"Gracias por tu firma! Eres el " + str(numUsuari.value)+ " que ha firmado.")
+                    numUsuari.value = numUsuari.value + 1
+                    fic.close()
+            else:
+                fic = open('votos.txt', 'a')
+                fic.write("LLUC X PRESIDENT")
+                fic.write(str(numUsuari.value) + " - " +key[1].upper()+" "+key[2].upper()+" "+key[3].upper()+"\n")
+                bot.reply_to(message,"Gracias por tu firma! Eres el "+ str(numUsuari.value) +" que ha firmado.")
+                numUsuari.value = 2
+                fic.close()
+            escribiendo.release()
 
 
 
